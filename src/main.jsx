@@ -92,12 +92,12 @@ function App() {
           event.preventDefault();
           setRegistrationState({ loading: true, message: '', error: '', registrationId: '' });
           try {
-            const response = await fetch('/api/registrations', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ fullName: registration.fullName.trim(), age: Number(registration.age), fatherName: registration.fatherName.trim(), phone: registration.phone.trim(), aadhaarNumber: registration.aadhaarNumber.trim(), dateOfBirth: registration.dateOfBirth, address: registration.address.trim(), district: registration.district.trim(), pincode: registration.pincode.trim(), battingHand: registration.battingHand, wicketKeeper: registration.wicketKeeper, fastBowling: registration.fastBowling, spinBowling: registration.spinBowling, kitSize: registration.kitSize, playerPhoto: registration.playerPhoto, consent: registration.consent }) });
+            const response = await fetch(`${API_BASE}/api/registrations`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ fullName: registration.fullName.trim(), age: Number(registration.age), fatherName: registration.fatherName.trim(), phone: registration.phone.trim(), aadhaarNumber: registration.aadhaarNumber.trim(), dateOfBirth: registration.dateOfBirth, address: registration.address.trim(), district: registration.district.trim(), pincode: registration.pincode.trim(), battingHand: registration.battingHand, wicketKeeper: registration.wicketKeeper, fastBowling: registration.fastBowling, spinBowling: registration.spinBowling, kitSize: registration.kitSize, playerPhoto: registration.playerPhoto, consent: registration.consent }) });
             const responseText = await response.text();
             const result = responseText ? JSON.parse(responseText) : {};
             if (!response.ok) throw new Error(result.message || 'Unable to submit registration. Please try again.');
             setRegistrationState({ loading: false, message: 'Your details have been saved as pending. Complete payment to confirm your registration.', error: '', registrationId: result.registrationId });
-            const orderResponse = await fetch('/api/payments/create-order', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ registrationId: result.registrationId }) });
+            const orderResponse = await fetch(`${API_BASE}/api/payments/create-order`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ registrationId: result.registrationId }) });
             const order = await orderResponse.json();
             if (!orderResponse.ok) throw new Error(order.message || 'Registration saved, but online payment is not configured yet. Please contact the organizer with your registration ID.');
             if (!window.Razorpay) {
@@ -106,7 +106,7 @@ function App() {
             const checkout = new window.Razorpay({
               key: order.keyId, amount: order.amount, currency: order.currency || 'INR', name: 'HN Nayi Disha Foundation', description: 'HCPL Season 3 Player Registration', order_id: order.orderId, prefill: { name: registration.fullName.trim(), contact: registration.phone.trim() }, theme: { color: '#ffd400' }, handler: async (payment) => {
                 try {
-                  const verifyResponse = await fetch('/api/payments/verify', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ registrationId: result.registrationId, razorpay_order_id: payment.razorpay_order_id, razorpay_payment_id: payment.razorpay_payment_id, razorpay_signature: payment.razorpay_signature }) });
+                  const verifyResponse = await fetch(`${API_BASE}/api/payments/verify`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ registrationId: result.registrationId, razorpay_order_id: payment.razorpay_order_id, razorpay_payment_id: payment.razorpay_payment_id, razorpay_signature: payment.razorpay_signature }) });
                   const verified = await verifyResponse.json();
                   if (!verifyResponse.ok) throw new Error(verified.message || 'Payment verification failed. Contact the organizer before retrying.');
                   setRegistrationState({ loading: false, message: 'Payment verified successfully. Your registration is confirmed.', error: '', registrationId: result.registrationId });

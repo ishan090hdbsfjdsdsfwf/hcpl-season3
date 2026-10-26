@@ -222,6 +222,8 @@ function App() {
     </footer>
   </div>
 }
+const root = createRoot(document.getElementById('root'));
+
 root.render(
   window.location.pathname.replace(/\/+$/, '') === '/admin'
     ? <AdminPage />

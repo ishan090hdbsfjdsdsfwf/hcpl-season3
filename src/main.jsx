@@ -7,6 +7,8 @@ import { MapPin, CalendarDays, Users, Trophy, ArrowRight, ShieldCheck, Star, Men
 import './styles.css';
 import AdminPage from './Admin.jsx';
 
+const API_BASE = import.meta.env.VITE_API_URL || '';
+
 const awards = [
   { title: 'Best Batsman', prize: 'LED TV', icon: '📺' },
   { title: 'Best Bowler', prize: 'Refrigerator', icon: '🧊' },

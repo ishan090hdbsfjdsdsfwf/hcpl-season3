@@ -3,7 +3,7 @@ import React from 'react';
 import * as XLSX from 'xlsx';
 import './admin.css';
 
-const API = '/api/admin';
+const API = `${import.meta.env.VITE_API_URL || ''}/api/admin`;
 
 function money(paise = 0) {
     return new Intl.NumberFormat('en-IN', {

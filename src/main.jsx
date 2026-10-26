@@ -93,7 +93,8 @@ function App() {
           setRegistrationState({ loading: true, message: '', error: '', registrationId: '' });
           try {
             const response = await fetch('/api/registrations', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ fullName: registration.fullName.trim(), age: Number(registration.age), fatherName: registration.fatherName.trim(), phone: registration.phone.trim(), aadhaarNumber: registration.aadhaarNumber.trim(), dateOfBirth: registration.dateOfBirth, address: registration.address.trim(), district: registration.district.trim(), pincode: registration.pincode.trim(), battingHand: registration.battingHand, wicketKeeper: registration.wicketKeeper, fastBowling: registration.fastBowling, spinBowling: registration.spinBowling, kitSize: registration.kitSize, playerPhoto: registration.playerPhoto, consent: registration.consent }) });
-            const result = await response.json();
+            const responseText = await response.text();
+            const result = responseText ? JSON.parse(responseText) : {};
             if (!response.ok) throw new Error(result.message || 'Unable to submit registration. Please try again.');
             setRegistrationState({ loading: false, message: 'Your details have been saved as pending. Complete payment to confirm your registration.', error: '', registrationId: result.registrationId });
             const orderResponse = await fetch('/api/payments/create-order', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ registrationId: result.registrationId }) });

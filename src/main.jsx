@@ -206,14 +206,10 @@ function App() {
               {['Right Hand', 'Fast-Medium', 'Medium-fast'].map(option => <label className="choice-option" key={option}><input type="radio" name="fastBowling" required checked={registration.fastBowling === option} onChange={() => setRegistration({ ...registration, fastBowling: option })} /> {option}</label>)}
               <label className="choice-option"><input type="radio" name="fastBowling" checked={registration.fastBowling === 'Not a fast bowler'} onChange={() => setRegistration({ ...registration, fastBowling: 'Not a fast bowler' })} /> Not applicable</label>
             </fieldset>
-            <fieldset><legend>Bowler (Spin)</legend>
-              {['Off-Spinner', 'Leg-Spinner', 'Left-arm orthodox spinner', 'Left-arm unorthodox spinner (Chinaman)', 'Not a spin bowler'].map(option => <label className="choice-option" key={option}><input type="radio" name="spinBowling" required checked={registration.spinBowling === option} onChange={() => setRegistration({ ...registration, spinBowling: option })} /> {option}</label>)}
-            </fieldset>
             <fieldset><legend>Please choose kit size *</legend>
               {['S', 'M', 'L', 'XL', 'XXL'].map(option => <label className="choice-option" key={option}><input type="radio" name="kitSize" required checked={registration.kitSize === option} onChange={() => setRegistration({ ...registration, kitSize: option })} /> {option}</label>)}
             </fieldset>
           </div>
-          <p className="district-note">The tournament will include eligible teams from <strong>Hamirpur district</strong>. Please confirm district eligibility with the organizers.</p>
           <label className="consent-check"><input type="checkbox" required checked={registration.consent} onChange={e => setRegistration({ ...registration, consent: e.target.checked })} /><span>I confirm the information is accurate, I am eligible under the Hamirpur district rule, and I agree that the committee may use these details to manage this tournament registration.</span></label>
           {registrationState.error && <div className="form-alert form-error" role="alert">{registrationState.error}{registrationState.registrationId && <span> Registration ID: <b>{registrationState.registrationId}</b></span>}</div>}
           {registrationState.message && <div className="form-alert form-success" role="status"><CheckCircle2 size={20} /><span>{registrationState.message}{registrationState.registrationId && <><br />Registration ID: <b>{registrationState.registrationId}</b></>}</span></div>}

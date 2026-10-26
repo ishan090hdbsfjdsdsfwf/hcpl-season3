@@ -15,11 +15,16 @@ const MAX_JSON_SIZE = '2mb';
 
 app.use(helmet());
 
+
 app.use(cors({
   origin: process.env.CLIENT_ORIGIN
     ? process.env.CLIENT_ORIGIN.split(',').map(s => s.trim())
-    : 'http://localhost:5173'
+    : [
+      'http://localhost:5173',
+      'https://hcpl-season3-1.onrender.com'
+    ]
 }));
+
 
 app.use(express.json({ limit: MAX_JSON_SIZE }));
 

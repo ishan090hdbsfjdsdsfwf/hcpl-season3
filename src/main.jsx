@@ -178,10 +178,29 @@ function App() {
           </div>
           <div className="skills-box">
             <h4>Player skill level (Batting / Bowler)</h4>
-            <fieldset><legend>Batsman</legend>
-              <label className="choice-option"><input type="radio" name="battingHand" required checked={registration.battingHand === 'Right Hand'} onChange={() => setRegistration({ ...registration, battingHand: 'Right Hand' })} /> Right Hand</label>
-              <label className="choice-option"><input type="radio" name="battingHand" checked={registration.battingHand === 'Left Hand'} onChange={() => setRegistration({ ...registration, battingHand: 'Left Hand' })} /> Left Hand</label>
-              <label className="choice-option"><input type="checkbox" checked={registration.wicketKeeper} onChange={e => setRegistration({ ...registration, wicketKeeper: e.target.checked })} /> Wicket Keeper</label>
+            <fieldset>
+              <legend>Batsman</legend>
+
+              <label className="choice-option">
+                <input
+                  type="radio"
+                  name="battingHand"
+                  required
+                  checked={registration.battingHand === 'Right Hand'}
+                  onChange={() => setRegistration({ ...registration, battingHand: 'Right Hand' })}
+                />
+                Right Hand
+              </label>
+
+              <label className="choice-option">
+                <input
+                  type="radio"
+                  name="battingHand"
+                  checked={registration.battingHand === 'Left Hand'}
+                  onChange={() => setRegistration({ ...registration, battingHand: 'Left Hand' })}
+                />
+                Left Hand
+              </label>
             </fieldset>
             <fieldset><legend>Bowler (Fast)</legend>
               {['Right Hand', 'Fast-Medium', 'Medium-fast'].map(option => <label className="choice-option" key={option}><input type="radio" name="fastBowling" required checked={registration.fastBowling === option} onChange={() => setRegistration({ ...registration, fastBowling: option })} /> {option}</label>)}

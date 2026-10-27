@@ -11,7 +11,7 @@ import crypto from 'node:crypto';
 const app = express();
 const PORT = Number(process.env.PORT || 5000);
 const REGISTRATION_FEE_PAISE = 70000;
-const MAX_JSON_SIZE = '2mb';
+const MAX_JSON_SIZE = '15mb';
 
 app.use(helmet());
 
@@ -81,7 +81,7 @@ const registrationSchema = new mongoose.Schema({
   spinBowling: { type: String, maxlength: 60 },
   kitSize: { type: String, enum: ['S', 'M', 'L', 'XL', 'XXL'] },
   // Compressed WebP data URL. Keep it excluded from normal admin list queries.
-  playerPhoto: { type: String, default: '', select: false, maxlength: 1000000 },
+  playerPhoto: { type: String, default: '', select: false, maxlength: 14000000 },
 
   feePaise: {
     type: Number, required: true, default: REGISTRATION_FEE_PAISE
@@ -205,16 +205,16 @@ app.post('/api/registrations', async (req, res) => {
     }
 
     const playerPhoto = typeof body.playerPhoto === 'string' ? body.playerPhoto : '';
-    if (!playerPhoto.startsWith('data:image/webp;base64,')) {
-      return res.status(400).json({ message: 'Please upload a valid player photo.' });
-    }
-    if (playerPhoto.length > 950000) {
-      return res.status(413).json({ message: 'Compressed photo is too large. Please choose another photo.' });
+
+    if (!/^data:image\/(jpeg|png|webp);base64,/.test(playerPhoto)) {
+      return res.status(400).json({
+        message: 'Please upload a valid JPG, PNG, or WEBP photo.'
+      });
     }
 
-    if (body.consent !== true) {
-      return res.status(400).json({
-        message: 'Please confirm the registration consent.'
+    if (playerPhoto.length > 14000000) {
+      return res.status(413).json({
+        message: 'Photo is too large. Please upload an image under 10 MB.'
       });
     }
 
@@ -266,8 +266,10 @@ app.post('/api/registrations', async (req, res) => {
     console.error('Registration creation failed:', error.message);
 
     if (error.name === 'ValidationError') {
+      console.error('Registration validation details:', error);
       return res.status(400).json({
-        message: 'Some registration fields are invalid. Check your details.'
+        message: 'Validation failed: ' +
+          Object.values(error.errors || {}).map(e => e.message).join(', ')
       });
     }
 

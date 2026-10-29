@@ -297,80 +297,95 @@ export default function AdminPage() {
         setError('');
     }
 
+    function exportCsv() {
+        const columns = [
+            ['Registration ID', 'registrationId'],
+            ['Full Name', 'fullName'],
+            ['Age', 'age'],
+            ["Father's Name", 'fatherName'],
+            ['Phone', 'phone'],
+            ['Date of Birth', 'dateOfBirth'],
+            ['Address', 'address'],
+            ['District', 'district'],
+            ['PIN Code', 'pincode'],
+            ['Batting Hand', 'battingHand'],
+            ['Wicket Keeper', 'wicketKeeper'],
+            ['Fast Bowling', 'fastBowling'],
+            ['Spin Bowling', 'spinBowling'],
+            ['Kit Size', 'kitSize'],
+            ['Fee (INR)', 'feePaise'],
+            ['Payment Status', 'paymentStatus'],
+            ['Offline Payment Method', 'offlinePaymentMethod'],
+            ['Offline Payment Reference', 'offlinePaymentReference'],
+            ['Offline Payment Recorded At', 'offlinePaymentMarkedAt'],
+            ['Offline Payment Recorded By', 'offlinePaymentMarkedBy'],
+            ['Razorpay Payment ID', 'razorpayPaymentId'],
+            ['Registered At', 'createdAt']
+        ];
 
-    async function exportCsv() {
+        const cell = value =>
+            `"${String(value ?? '').replace(/"/g, '""')}"`;
+
+        const rows = [columns.map(([label]) => cell(label)).join(',')];
+
+        for (const player of players) {
+            rows.push(columns.map(([, key]) => {
+                if (key === 'registrationId') return cell(player.registrationId);
+                if (key === 'feePaise') {
+                    return cell((Number(player[key] || 0) / 100).toFixed(2));
+                }
+                if (
+                    key === 'dateOfBirth' ||
+                    key === 'createdAt' ||
+                    key === 'offlinePaymentMarkedAt'
+                ) {
+                    return cell(dateLabel(player[key]));
+                }
+                if (key === 'wicketKeeper') {
+                    return cell(player[key] ? 'Yes' : 'No');
+                }
+                return cell(player[key]);
+            }).join(','));
+        }
+
+        const blob = new Blob(['\ufeff' + rows.join('\r\n')], {
+            type: 'text/csv;charset=utf-8;'
+        });
+
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'hcpl-registrations.csv';
+        link.click();
+        URL.revokeObjectURL(url);
+    }
+
+    async function exportCricAuction() {
         setError('');
-
         try {
             const data = await request('/cricauction-export');
-            const players = data.players || [];
-
             const headers = [
-                'No', 'NAME', 'PHONE', 'PHOTO', 'AGE', 'SKILL',
-                'SPECIFICATION 1', 'SPECIFICATION 2', 'SPECIFICATION 3',
-                'CATEGORY', 'EXTRA DETAILS', 'JERSEY NAME', 'JERSEY NO',
-                'JERSEY SIZE', 'TROUSER SIZE', 'BASE VALUE', 'MATCH',
-                'RUN', 'WICKET', 'CUSTOM DATA', 'INFO 1', 'INFO 2',
-                'INFO 3', 'INFO 4', 'INFO 5', 'INFO 6',
-                'UPLOAD IMAGE 1', 'UPLOAD IMAGE 2'
+                'No', 'NAME', 'PHONE', 'PHOTO', 'AGE', 'SKILL', 'SPECIFICATION 1',
+                'SPECIFICATION 2', 'SPECIFICATION 3', 'CATEGORY', 'EXTRA DETAILS',
+                'JERSEY NAME', 'JERSEY NO', 'JERSEY SIZE', 'TROUSER SIZE', 'BASE VALUE',
+                'MATCH', 'RUN', 'WICKET', 'CUSTOM DATA', 'INFO 1', 'INFO 2', 'INFO 3',
+                'INFO 4', 'INFO 5', 'INFO 6', 'UPLOAD IMAGE 1', 'UPLOAD IMAGE 2'
             ];
-
-            const rows = players.map(p => [
-                p.no,
-                p.name,
-                p.phone,
-                p.photo,
-                p.age,
-                p.skill,
-                p.specification1,
-                p.specification2,
-                p.specification3,
-                p.category,
-                p.extraDetails,
-                p.jerseyName,
-                p.jerseyNo,
-                p.jerseySize,
-                p.trouserSize,
-                p.baseValue,
-                p.match,
-                p.run,
-                p.wicket,
-                p.customData,
-                p.info1,
-                p.info2,
-                p.info3,
-                p.info4,
-                p.info5,
-                p.info6,
-                p.uploadImage1,
-                p.uploadImage2
+            const rows = (data.players || []).map(p => [
+                p.no, p.name, p.phone, p.photo, p.age, p.skill, p.specification1,
+                p.specification2, p.specification3, p.category, p.extraDetails,
+                p.jerseyName, p.jerseyNo, p.jerseySize, p.trouserSize, p.baseValue,
+                p.match, p.run, p.wicket, p.customData, p.info1, p.info2, p.info3,
+                p.info4, p.info5, p.info6, p.uploadImage1, p.uploadImage2
             ]);
-
-            const escapeCsv = value => {
-                const text = value == null ? '' : String(value);
-                return `"${text.replace(/"/g, '""')}"`;
-            };
-
-            const csv = [
-                headers.map(escapeCsv).join(','),
-                ...rows.map(row => row.map(escapeCsv).join(','))
-            ].join('\r\n');
-
-            const blob = new Blob(['\uFEFF', csv], {
-                type: 'text/csv;charset=utf-8;'
-            });
-
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-
-            link.href = url;
-            link.download = 'hcpl-cricauction-import.csv';
-            document.body.appendChild(link);
-            link.click();
-            link.remove();
-            URL.revokeObjectURL(url);
-        } catch (error) {
-            setError(error.message || 'Could not export CricAuction CSV.');
+            const worksheet = XLSX.utils.aoa_to_sheet([headers, ...rows]);
+            worksheet['!cols'] = headers.map((h, i) => ({ wch: i === 3 ? 48 : Math.min(24, Math.max(12, h.length + 2)) }));
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
+            XLSX.writeFile(workbook, 'hcpl-cricauction-players.xlsx');
+            setError('');
+        } catch (err) {
+            setError(err.message || 'Could not export CricAuction spreadsheet.');
         }
     }
 

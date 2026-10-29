@@ -889,7 +889,7 @@ app.get('/api/admin/registrations', requireAdmin, async (req, res) => {
 
     const registrations = await Registration.find(filter)
       .select(
-        'fullName phone dateOfBirth address district pincode age fatherName battingHand wicketKeeper fastBowling spinBowling kitSize feePaise paymentStatus razorpayPaymentId createdAt'
+        '+playerPhoto fullName phone dateOfBirth address district pincode age fatherName battingHand wicketKeeper fastBowling spinBowling'
       )
       .sort({ _id: -1 })
       .limit(500)

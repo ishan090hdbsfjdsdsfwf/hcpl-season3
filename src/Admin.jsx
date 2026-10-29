@@ -573,10 +573,30 @@ export default function AdminPage() {
                             <tbody>
                                 {players.map(player => (
                                     <tr key={player._id}>
+
                                         <td>
-                                            <strong>{player.fullName || '—'}</strong>
-                                            <small>{player.registrationId}</small>
+                                            <div className="admin-player-info">
+                                                {player.playerPhoto &&
+                                                    player.playerPhoto.startsWith('data:image/') ? (
+                                                    <img
+                                                        src={player.playerPhoto}
+                                                        alt={player.fullName || 'Player'}
+                                                        className="admin-player-photo"
+                                                        loading="lazy"
+                                                    />
+                                                ) : (
+                                                    <div className="admin-player-photo admin-player-photo-placeholder">
+                                                        {(player.fullName || 'P').charAt(0).toUpperCase()}
+                                                    </div>
+                                                )}
+
+                                                <div className="admin-player-details">
+                                                    <strong>{player.fullName || '—'}</strong>
+                                                    <small>{player.registrationId}</small>
+                                                </div>
+                                            </div>
                                         </td>
+
 
                                         <td>
                                             {player.phone || '—'}

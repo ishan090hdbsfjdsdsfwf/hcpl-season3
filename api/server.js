@@ -891,7 +891,7 @@ app.get('/api/admin/registrations', requireAdmin, async (req, res) => {
       .select(
         'fullName phone dateOfBirth address district pincode age fatherName battingHand wicketKeeper fastBowling spinBowling kitSize feePaise paymentStatus razorpayPaymentId createdAt'
       )
-      .sort({ createdAt: -1 })
+      .sort({ _id: -1 })
       .limit(500)
       .lean();
 

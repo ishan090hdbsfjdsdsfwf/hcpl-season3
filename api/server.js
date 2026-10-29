@@ -821,7 +821,7 @@ app.get('/api/admin/cricauction-export', requireAdmin, async (req, res) => {
   try {
     const players = await Registration.find({})
       .select('+playerPhoto fullName phone dateOfBirth age fatherName battingHand wicketKeeper fastBowling spinBowling address district pincode kitSize createdAt')
-      .sort({ createdAt: 1 })
+      .sort({ _id: 1 })
       .limit(500)
       .lean();
 
